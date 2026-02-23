@@ -3,19 +3,16 @@ import { jwtVerify, SignJWT } from 'jose'
 
 export interface AgentTokenPayload {
   sub: string
-  type: 'agent'
-  name: string
-  owner: string
-  approver: string
+  act: 'agent'
 }
 
 export async function issueAgentToken(
-  payload: Omit<AgentTokenPayload, 'type'>,
+  payload: { sub: string },
   issuer: string,
   privateKey: KeyLike,
   kid?: string,
 ): Promise<string> {
-  const jwt = new SignJWT({ ...payload, type: 'agent' })
+  const jwt = new SignJWT({ sub: payload.sub, act: 'agent' })
     .setProtectedHeader({ alg: 'ES256', ...(kid ? { kid } : {}) })
     .setIssuer(issuer)
     .setSubject(payload.sub)
@@ -35,7 +32,7 @@ export async function verifyAgentToken(
     algorithms: ['ES256'],
   })
 
-  if (payload.type !== 'agent') {
+  if (payload.act !== 'agent') {
     throw new Error('Not an agent token')
   }
 

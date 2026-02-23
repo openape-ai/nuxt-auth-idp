@@ -17,6 +17,7 @@ const userSuccess = ref('')
 // Agents
 interface Agent {
   id: string
+  email: string
   name: string
   owner: string
   approver: string
@@ -26,7 +27,7 @@ interface Agent {
 }
 const agents = ref<Agent[]>([])
 const agentsLoading = ref(false)
-const newAgent = ref({ name: '', owner: '', approver: '', publicKey: '' })
+const newAgent = ref({ email: '', name: '', owner: '', approver: '', publicKey: '' })
 const agentError = ref('')
 const agentSuccess = ref('')
 const editingAgent = ref<Agent | null>(null)
@@ -117,7 +118,7 @@ async function createAgent() {
   try {
     await $fetch('/api/admin/agents', { method: 'POST', body: newAgent.value })
     agentSuccess.value = `Agent "${newAgent.value.name}" created`
-    newAgent.value = { name: '', owner: '', approver: '', publicKey: '' }
+    newAgent.value = { email: '', name: '', owner: '', approver: '', publicKey: '' }
     await loadAgents()
   }
   catch (err: unknown) {
@@ -168,6 +169,7 @@ async function saveEditAgent() {
     await $fetch(`/api/admin/agents/${editingAgent.value.id}`, {
       method: 'PUT',
       body: {
+        email: editingAgent.value.email,
         name: editingAgent.value.name,
         owner: editingAgent.value.owner,
         approver: editingAgent.value.approver,
@@ -370,6 +372,9 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                 <UModal :open="true" title="Edit Agent" @update:open="editingAgent = null">
                   <template #body>
                     <form class="space-y-3" @submit.prevent="saveEditAgent">
+                      <UFormField label="Email" required>
+                        <UInput v-model="editingAgent.email" type="email" required />
+                      </UFormField>
                       <UFormField label="Name" required>
                         <UInput v-model="editingAgent.name" required />
                       </UFormField>
@@ -408,6 +413,11 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                 <form class="space-y-3" @submit.prevent="createAgent">
                   <div class="flex flex-wrap gap-3">
                     <div class="flex-1 min-w-[200px]">
+                      <UFormField label="Agent Email" required>
+                        <UInput v-model="newAgent.email" type="email" required placeholder="agent@domain.com" />
+                      </UFormField>
+                    </div>
+                    <div class="flex-1 min-w-[200px]">
                       <UFormField label="Agent Name" required>
                         <UInput v-model="newAgent.name" required placeholder="My Agent" />
                       </UFormField>
@@ -443,6 +453,9 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                   <thead class="border-b border-(--ui-border)">
                     <tr>
                       <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Email
+                      </th>
+                      <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
                         Name
                       </th>
                       <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
@@ -464,6 +477,9 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                   </thead>
                   <tbody class="divide-y divide-(--ui-border)">
                     <tr v-for="a in agents" :key="a.id" class="hover:bg-(--ui-bg-elevated)">
+                      <td class="px-4 py-3 text-sm text-muted font-mono text-xs">
+                        {{ a.email }}
+                      </td>
                       <td class="px-4 py-3 text-sm">
                         {{ a.name }}
                       </td>

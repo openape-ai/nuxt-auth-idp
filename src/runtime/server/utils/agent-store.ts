@@ -1,5 +1,6 @@
 export interface Agent {
   id: string
+  email: string
   name: string
   owner: string
   approver: string
@@ -11,6 +12,7 @@ export interface Agent {
 export interface AgentStore {
   create: (agent: Agent) => Promise<Agent>
   findById: (id: string) => Promise<Agent | null>
+  findByEmail: (email: string) => Promise<Agent | null>
   update: (id: string, data: Partial<Omit<Agent, 'id' | 'createdAt'>>) => Promise<Agent>
   delete: (id: string) => Promise<void>
   listAll: () => Promise<Agent[]>
@@ -29,6 +31,11 @@ export function createAgentStore(): AgentStore {
 
     async findById(id) {
       return await storage.getItem<Agent>(`agents:${id}`) ?? null
+    },
+
+    async findByEmail(email) {
+      const all = await this.listAll()
+      return all.find(a => a.email === email) ?? null
     },
 
     async update(id, data) {

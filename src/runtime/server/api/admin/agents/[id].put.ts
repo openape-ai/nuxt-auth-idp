@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody<{
+    email?: string
     name?: string
     owner?: string
     approver?: string
@@ -25,6 +26,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const update: Record<string, unknown> = {}
+  if (body.email !== undefined)
+    update.email = body.email
   if (body.name !== undefined)
     update.name = body.name
   if (body.owner !== undefined)
