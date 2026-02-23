@@ -11,6 +11,9 @@ export interface ModuleOptions {
   rpName: string
   rpID: string
   rpOrigin: string
+  requireUserVerification: boolean
+  residentKey: 'preferred' | 'required' | 'discouraged'
+  attestationType: 'none' | 'indirect' | 'direct' | 'enterprise'
   s3: {
     accessKeyId: string
     secretAccessKey: string
@@ -36,6 +39,9 @@ export default defineNuxtModule<ModuleOptions>({
     rpName: '',
     rpID: '',
     rpOrigin: '',
+    requireUserVerification: false,
+    residentKey: 'preferred',
+    attestationType: 'none',
     s3: {
       accessKeyId: '',
       secretAccessKey: '',
