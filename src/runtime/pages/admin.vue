@@ -2,13 +2,15 @@
 const { user, loading: authLoading, fetchUser } = useIdpAuth()
 const route = useRoute()
 
-const activeTab = ref<'users' | 'agents'>(route.query.tab === 'agents' ? 'agents' : 'users')
+const activeTab = ref<string>(
+  route.query.tab === 'agents' ? 'agents' : route.query.tab === 'registration' ? 'registration' : 'users',
+)
 const enrolledAgentId = ref(route.query.enrolled as string || '')
 
 // Users
 const users = ref<{ email: string, name: string }[]>([])
 const usersLoading = ref(false)
-const newUser = ref({ name: '', email: '', password: '' })
+const newUser = ref({ name: '', email: '' })
 const userError = ref('')
 const userSuccess = ref('')
 
@@ -29,6 +31,23 @@ const agentError = ref('')
 const agentSuccess = ref('')
 const editingAgent = ref<Agent | null>(null)
 
+// Registration URLs
+interface RegistrationUrlEntry {
+  token: string
+  email: string
+  name: string
+  createdAt: number
+  expiresAt: number
+  createdBy: string
+  consumed: boolean
+}
+const regUrls = ref<RegistrationUrlEntry[]>([])
+const regUrlsLoading = ref(false)
+const newRegUrl = ref({ email: '', name: '', expiresInHours: 24 })
+const regUrlError = ref('')
+const regUrlSuccess = ref('')
+const copiedToken = ref('')
+
 onMounted(async () => {
   await fetchUser()
   if (!user.value) {
@@ -39,7 +58,7 @@ onMounted(async () => {
     await navigateTo('/')
     return
   }
-  await Promise.all([loadUsers(), loadAgents()])
+  await Promise.all([loadUsers(), loadAgents(), loadRegUrls()])
 })
 
 // User CRUD
@@ -58,7 +77,7 @@ async function createUser() {
   try {
     await $fetch('/api/admin/users', { method: 'POST', body: newUser.value })
     userSuccess.value = `User ${newUser.value.email} created`
-    newUser.value = { name: '', email: '', password: '' }
+    newUser.value = { name: '', email: '' }
     await loadUsers()
   }
   catch (err: unknown) {
@@ -164,8 +183,67 @@ async function saveEditAgent() {
   }
 }
 
+// Registration URLs
+async function loadRegUrls() {
+  regUrlsLoading.value = true
+  try {
+    regUrls.value = await $fetch('/api/admin/registration-urls')
+  }
+  catch { regUrls.value = [] }
+  finally { regUrlsLoading.value = false }
+}
+
+async function createRegUrl() {
+  regUrlError.value = ''
+  regUrlSuccess.value = ''
+  try {
+    const result = await $fetch<{ registrationUrl: string }>('/api/admin/registration-urls', {
+      method: 'POST',
+      body: newRegUrl.value,
+    })
+    regUrlSuccess.value = result.registrationUrl
+    newRegUrl.value = { email: '', name: '', expiresInHours: 24 }
+    await loadRegUrls()
+  }
+  catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string } }
+    regUrlError.value = e.data?.statusMessage ?? 'Failed to create registration URL'
+  }
+}
+
+async function deleteRegUrl(token: string) {
+  // eslint-disable-next-line no-alert
+  if (!confirm('Delete this registration URL?'))
+    return
+  regUrlError.value = ''
+  try {
+    await $fetch(`/api/admin/registration-urls/${token}`, { method: 'DELETE' })
+    await loadRegUrls()
+  }
+  catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string } }
+    regUrlError.value = e.data?.statusMessage ?? 'Failed to delete registration URL'
+  }
+}
+
+async function copyToClipboard(text: string, token: string) {
+  await navigator.clipboard.writeText(text)
+  copiedToken.value = token
+  setTimeout(() => { copiedToken.value = '' }, 2000)
+}
+
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString()
+}
+
+function formatDateTime(ts: number): string {
+  return new Date(ts).toLocaleString()
+}
+
+function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: string } {
+  if (entry.consumed) return { label: 'Used', color: 'neutral' }
+  if (entry.expiresAt < Date.now()) return { label: 'Expired', color: 'error' }
+  return { label: 'Active', color: 'success' }
 }
 </script>
 
@@ -178,7 +256,7 @@ function formatDate(ts: number): string {
             Admin Dashboard
           </h1>
           <p class="text-sm text-muted">
-            Manage users and agents
+            Manage users, agents, and registration URLs
           </p>
         </div>
         <UButton to="/" color="neutral" variant="soft" size="sm">
@@ -196,8 +274,10 @@ function formatDate(ts: number): string {
           :items="[
             { label: `Users (${users.length})`, value: 'users', slot: 'users' },
             { label: `Agents (${agents.length})`, value: 'agents', slot: 'agents' },
+            { label: 'Registration URLs', value: 'registration', slot: 'registration' },
           ]"
         >
+          <!-- Users Tab -->
           <template #users>
             <div class="space-y-6 mt-6">
               <UCard>
@@ -219,11 +299,6 @@ function formatDate(ts: number): string {
                   <div class="flex-1 min-w-[200px]">
                     <UFormField label="Email" required>
                       <UInput v-model="newUser.email" type="email" required placeholder="user@domain.com" />
-                    </UFormField>
-                  </div>
-                  <div class="flex-1 min-w-[150px]">
-                    <UFormField label="Password" required>
-                      <UInput v-model="newUser.password" type="password" required placeholder="Password" />
                     </UFormField>
                   </div>
                   <UButton color="primary" type="submit">
@@ -280,6 +355,7 @@ function formatDate(ts: number): string {
             </div>
           </template>
 
+          <!-- Agents Tab -->
           <template #agents>
             <div class="space-y-6 mt-6">
               <UAlert
@@ -413,6 +489,115 @@ function formatDate(ts: number): string {
                           {{ a.isActive ? 'Deactivate' : 'Activate' }}
                         </UButton>
                         <UButton variant="ghost" size="xs" color="error" @click="deleteAgent(a.id)">
+                          Delete
+                        </UButton>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </UCard>
+            </div>
+          </template>
+
+          <!-- Registration URLs Tab -->
+          <template #registration>
+            <div class="space-y-6 mt-6">
+              <UCard>
+                <template #header>
+                  <h2 class="text-lg font-semibold">
+                    Create Registration URL
+                  </h2>
+                </template>
+
+                <UAlert v-if="regUrlError" color="error" :title="regUrlError" class="mb-4" />
+                <UAlert v-if="regUrlSuccess" color="success" class="mb-4">
+                  <div class="flex items-center gap-2">
+                    <code class="text-xs break-all flex-1">{{ regUrlSuccess }}</code>
+                    <UButton
+                      size="xs"
+                      variant="soft"
+                      @click="copyToClipboard(regUrlSuccess, 'success')"
+                    >
+                      {{ copiedToken === 'success' ? 'Copied!' : 'Copy' }}
+                    </UButton>
+                  </div>
+                </UAlert>
+
+                <form class="flex flex-wrap gap-3 items-end" @submit.prevent="createRegUrl">
+                  <div class="flex-1 min-w-[200px]">
+                    <UFormField label="Email" required>
+                      <UInput v-model="newRegUrl.email" type="email" required placeholder="user@domain.com" />
+                    </UFormField>
+                  </div>
+                  <div class="flex-1 min-w-[150px]">
+                    <UFormField label="Name" required>
+                      <UInput v-model="newRegUrl.name" required placeholder="User Name" />
+                    </UFormField>
+                  </div>
+                  <div class="w-[120px]">
+                    <UFormField label="Expires (hours)">
+                      <UInput v-model.number="newRegUrl.expiresInHours" type="number" :min="1" :max="168" />
+                    </UFormField>
+                  </div>
+                  <UButton color="primary" type="submit">
+                    Create URL
+                  </UButton>
+                </form>
+              </UCard>
+
+              <UCard :ui="{ body: 'p-0' }">
+                <div v-if="regUrlsLoading" class="p-6 text-center text-muted">
+                  Loading...
+                </div>
+                <div v-else-if="regUrls.length === 0" class="p-6 text-center text-muted">
+                  No registration URLs found.
+                </div>
+                <table v-else class="w-full">
+                  <thead class="border-b border-(--ui-border)">
+                    <tr>
+                      <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Email
+                      </th>
+                      <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Name
+                      </th>
+                      <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Status
+                      </th>
+                      <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Expires
+                      </th>
+                      <th class="text-right px-4 py-3 text-xs font-medium text-muted uppercase">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-(--ui-border)">
+                    <tr v-for="r in regUrls" :key="r.token" class="hover:bg-(--ui-bg-elevated)">
+                      <td class="px-4 py-3 text-sm font-mono text-muted">
+                        {{ r.email }}
+                      </td>
+                      <td class="px-4 py-3 text-sm">
+                        {{ r.name }}
+                      </td>
+                      <td class="px-4 py-3">
+                        <UBadge :color="regUrlStatus(r).color as any" variant="subtle">
+                          {{ regUrlStatus(r).label }}
+                        </UBadge>
+                      </td>
+                      <td class="px-4 py-3 text-xs text-muted">
+                        {{ formatDateTime(r.expiresAt) }}
+                      </td>
+                      <td class="px-4 py-3 text-right space-x-1">
+                        <UButton
+                          v-if="!r.consumed && r.expiresAt > Date.now()"
+                          variant="ghost"
+                          size="xs"
+                          @click="copyToClipboard(`${window.location.origin}/register?token=${r.token}`, r.token)"
+                        >
+                          {{ copiedToken === r.token ? 'Copied!' : 'Copy URL' }}
+                        </UButton>
+                        <UButton variant="ghost" size="xs" color="error" @click="deleteRegUrl(r.token)">
                           Delete
                         </UButton>
                       </td>

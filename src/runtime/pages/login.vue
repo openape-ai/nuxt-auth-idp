@@ -1,17 +1,16 @@
 <script setup lang="ts">
-const { login } = useIdpAuth()
+const { fetchUser } = useIdpAuth()
+const { login, error: webauthnError, loading: webauthnLoading } = useWebAuthn()
 const route = useRoute()
 
 const email = ref((route.query.login_hint as string) ?? '')
-const password = ref('')
 const error = ref('')
-const submitting = ref(false)
 
-async function handleSubmit() {
+async function handleLogin() {
   error.value = ''
-  submitting.value = true
   try {
-    await login(email.value, password.value)
+    await login(email.value || undefined)
+    await fetchUser()
     const returnTo = route.query.returnTo as string | undefined
     if (returnTo) {
       await navigateTo(returnTo, { external: true })
@@ -20,12 +19,8 @@ async function handleSubmit() {
       await navigateTo('/')
     }
   }
-  catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }, message?: string }
-    error.value = e.data?.statusMessage ?? e.message ?? 'Login failed'
-  }
-  finally {
-    submitting.value = false
+  catch {
+    error.value = webauthnError.value
   }
 }
 </script>
@@ -46,36 +41,25 @@ async function handleSubmit() {
         class="mb-4"
       />
 
-      <form class="space-y-4" @submit.prevent="handleSubmit">
-        <UFormField label="Email" required>
+      <div class="space-y-4">
+        <UFormField label="Email (optional)">
           <UInput
             id="email"
             v-model="email"
             type="email"
-            required
             placeholder="user@example.com"
           />
         </UFormField>
 
-        <UFormField label="Password" required>
-          <UInput
-            id="password"
-            v-model="password"
-            type="password"
-            required
-            placeholder="Password"
-          />
-        </UFormField>
-
         <UButton
-          type="submit"
           color="primary"
           block
-          :loading="submitting"
-          :disabled="submitting"
-          :label="submitting ? 'Logging in...' : 'Login'"
+          :loading="webauthnLoading"
+          :disabled="webauthnLoading"
+          :label="webauthnLoading ? 'Authenticating...' : 'Sign in with Passkey'"
+          @click="handleLogin"
         />
-      </form>
+      </div>
 
       <template #footer>
         <div class="text-center">

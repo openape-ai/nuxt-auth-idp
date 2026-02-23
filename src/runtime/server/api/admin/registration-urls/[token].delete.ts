@@ -1,0 +1,11 @@
+export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
+  const token = getRouterParam(event, 'token')
+  if (!token) {
+    throw createError({ statusCode: 400, statusMessage: 'Missing token' })
+  }
+
+  const { registrationUrlStore } = useIdpStores()
+  await registrationUrlStore.delete(token)
+  return { ok: true }
+})

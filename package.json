@@ -25,6 +25,7 @@
     "@nuxt/kit": "^3.16.0",
     "@openape/auth": "workspace:*",
     "@openape/core": "workspace:*",
+    "@simplewebauthn/browser": "^11",
     "defu": "^6.1.4",
     "jose": "^5.9.0",
     "unstorage": "^1.14.4"

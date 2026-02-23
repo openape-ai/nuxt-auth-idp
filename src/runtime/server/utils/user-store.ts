@@ -1,13 +1,10 @@
-import { generateSalt, hashPassword, verifyPassword } from '@openape/core'
-
 export interface User {
   email: string
   name: string
 }
 
 export interface UserStore {
-  register: (email: string, password: string, name: string) => Promise<User>
-  authenticate: (email: string, password: string) => Promise<User | null>
+  create: (email: string, name: string) => Promise<User>
   findByEmail: (email: string) => Promise<User | null>
   listUsers: () => Promise<User[]>
   deleteUser: (email: string) => Promise<void>
@@ -16,38 +13,21 @@ export interface UserStore {
 interface StoredUser {
   email: string
   name: string
-  passwordHash: string
-  salt: string
+  createdAt: number
 }
 
 export function createUserStore(): UserStore {
   const storage = useAppStorage()
 
   return {
-    async register(email, password, name) {
-      const salt = generateSalt()
-      const passwordHash = await hashPassword(password, salt)
-
+    async create(email, name) {
       await storage.setItem<StoredUser>(`users:${email}`, {
         email,
         name,
-        passwordHash,
-        salt,
+        createdAt: Date.now(),
       })
 
       return { email, name }
-    },
-
-    async authenticate(email, password) {
-      const user = await storage.getItem<StoredUser>(`users:${email}`)
-      if (!user)
-        return null
-
-      const valid = await verifyPassword(password, user.salt, user.passwordHash)
-      if (!valid)
-        return null
-
-      return { email: user.email, name: user.name }
     },
 
     async findByEmail(email) {
