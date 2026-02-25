@@ -1,4 +1,4 @@
-import { ref } from '#imports'
+import { ref } from 'vue'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 
 export function useWebAuthn() {

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { navigateTo, useRoute } from '#imports'
+import { useIdpAuth } from '../composables/useIdpAuth'
+
 const { user, loading: authLoading, fetchUser } = useIdpAuth()
 const route = useRoute()
 

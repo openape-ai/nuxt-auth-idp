@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { navigateTo, useRoute } from '#imports'
+import { useIdpAuth } from '../composables/useIdpAuth'
+import { useWebAuthn } from '../composables/useWebAuthn'
+
 const { fetchUser } = useIdpAuth()
 const { registerWithToken, error: webauthnError, loading: webauthnLoading } = useWebAuthn()
 const route = useRoute()

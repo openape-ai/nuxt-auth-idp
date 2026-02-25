@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { navigateTo } from '#imports'
+import { useIdpAuth } from '../composables/useIdpAuth'
+import { useWebAuthn } from '../composables/useWebAuthn'
+
 const { user, loading: authLoading, fetchUser } = useIdpAuth()
 const { addDevice, error: webauthnError, loading: webauthnLoading } = useWebAuthn()
 
