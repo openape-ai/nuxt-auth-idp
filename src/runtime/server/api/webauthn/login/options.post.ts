@@ -4,7 +4,7 @@ import { getRPConfig } from '../../../utils/rp-config'
 import { useIdpStores } from '../../../utils/stores'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{ email?: string }>(event)
+  const body = await readBody<{ email?: string }>(event) ?? {}
 
   const { credentialStore, challengeStore } = useIdpStores()
   const rpConfig = getRPConfig()

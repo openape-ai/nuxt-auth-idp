@@ -5,7 +5,7 @@ import { getRPConfig } from '../../../utils/rp-config'
 import { useIdpStores } from '../../../utils/stores'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{ challengeToken: string, response: any }>(event)
+  const body = await readBody<{ challengeToken: string, response: any }>(event) ?? {} as { challengeToken: string, response: any }
   if (!body.challengeToken || !body.response) {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields: challengeToken, response' })
   }
