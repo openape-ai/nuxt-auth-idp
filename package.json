@@ -2,7 +2,7 @@
   "name": "@openape/nuxt-auth-idp",
   "type": "module",
   "version": "0.1.0",
-  "description": "OpenAPE Identity Provider Nuxt module — adds user auth, OAuth, admin, and agent management",
+  "description": "OpenApe Identity Provider Nuxt module — adds user auth, OAuth, admin, and agent management",
   "author": "Patrick Hofmann",
   "license": "MIT",
   "exports": {
