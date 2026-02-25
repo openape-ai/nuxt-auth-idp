@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "description": "OpenAPE Identity Provider Nuxt module — adds user auth, OAuth, admin, and agent management",
-  "author": "Delta Mind GmbH",
+  "author": "Patrick Hofmann",
   "license": "MIT",
   "exports": {
     ".": {
@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.16.0",
-    "@openape/auth": "workspace:*",
-    "@openape/core": "workspace:*",
+    "@openape/auth": "^0.1.0",
+    "@openape/core": "^0.1.0",
     "@simplewebauthn/browser": "^11",
     "defu": "^6.1.4",
     "jose": "^5.9.0",
@@ -37,5 +37,12 @@
     "@nuxt/module-builder": "^0.8.4",
     "nuxt": "^4.3.1",
     "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openape-ai/nuxt-auth-idp.git"
   }
 }
