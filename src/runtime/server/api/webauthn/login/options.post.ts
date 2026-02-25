@@ -1,4 +1,7 @@
+import { createError, defineEventHandler, readBody } from 'h3'
 import { createAuthenticationOptions } from '@openape/auth'
+import { getRPConfig } from '../../../utils/rp-config'
+import { useIdpStores } from '../../../utils/stores'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ email?: string }>(event)

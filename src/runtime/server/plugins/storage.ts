@@ -1,4 +1,4 @@
-import { defineNitroPlugin, useRuntimeConfig, useStorage } from '#imports'
+import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runtime'
 
 export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig()

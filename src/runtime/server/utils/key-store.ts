@@ -2,6 +2,7 @@ import type { KeyEntry, KeyStore } from '@openape/auth'
 import type { KeyLike } from 'jose'
 import { generateKeyPair } from '@openape/core'
 import { exportJWK, importJWK } from 'jose'
+import { useAppStorage } from './storage'
 
 interface StoredKey {
   kid: string

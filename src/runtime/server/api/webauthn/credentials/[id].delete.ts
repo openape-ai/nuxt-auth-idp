@@ -1,3 +1,7 @@
+import { createError, defineEventHandler, getRouterParam } from 'h3'
+import { requireAuth } from '../../../utils/admin'
+import { useIdpStores } from '../../../utils/stores'
+
 export default defineEventHandler(async (event) => {
   const userId = await requireAuth(event)
   const credentialId = getRouterParam(event, 'id')

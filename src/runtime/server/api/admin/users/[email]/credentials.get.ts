@@ -1,3 +1,7 @@
+import { createError, defineEventHandler, getRouterParam } from 'h3'
+import { requireAdmin } from '../../../../utils/admin'
+import { useIdpStores } from '../../../../utils/stores'
+
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const email = getRouterParam(event, 'email')

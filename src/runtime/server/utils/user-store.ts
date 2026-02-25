@@ -1,3 +1,5 @@
+import { useAppStorage } from './storage'
+
 export interface User {
   email: string
   name: string

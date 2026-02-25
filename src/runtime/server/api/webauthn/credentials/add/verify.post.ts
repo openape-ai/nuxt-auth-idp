@@ -1,4 +1,8 @@
+import { createError, defineEventHandler, readBody } from 'h3'
 import { verifyRegistration } from '@openape/auth'
+import { requireAuth } from '../../../../utils/admin'
+import { getRPConfig } from '../../../../utils/rp-config'
+import { useIdpStores } from '../../../../utils/stores'
 
 export default defineEventHandler(async (event) => {
   const userId = await requireAuth(event)

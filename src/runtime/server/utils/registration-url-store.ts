@@ -1,4 +1,5 @@
 import type { RegistrationUrl, RegistrationUrlStore } from '@openape/auth'
+import { useAppStorage } from './storage'
 
 export function createRegistrationUrlStore(): RegistrationUrlStore {
   const storage = useAppStorage()

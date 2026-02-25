@@ -1,4 +1,6 @@
 import type { H3Event } from 'h3'
+import { useSession } from 'h3'
+import { useRuntimeConfig } from 'nitropack/runtime'
 
 export async function getAppSession(event: H3Event) {
   const config = useRuntimeConfig()

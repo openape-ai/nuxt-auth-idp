@@ -1,6 +1,8 @@
 import type { H3Event } from 'h3'
+import { createError, getHeader } from 'h3'
 import type { AgentTokenPayload } from './agent-token'
 import { verifyAgentToken } from './agent-token'
+import { getIdpIssuer, useIdpStores } from './stores'
 
 export async function requireAgent(event: H3Event): Promise<AgentTokenPayload> {
   const authHeader = getHeader(event, 'authorization')

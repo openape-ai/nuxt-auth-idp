@@ -1,4 +1,5 @@
 import type { CodeEntry, CodeStore } from '@openape/auth'
+import { useAppStorage } from './storage'
 
 export function createCodeStore(): CodeStore {
   const storage = useAppStorage()

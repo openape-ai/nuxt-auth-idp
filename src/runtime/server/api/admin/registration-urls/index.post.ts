@@ -1,3 +1,8 @@
+import { createError, defineEventHandler, readBody } from 'h3'
+import { requireAdmin } from '../../../utils/admin'
+import { getRPConfig } from '../../../utils/rp-config'
+import { useIdpStores } from '../../../utils/stores'
+
 export default defineEventHandler(async (event) => {
   const adminEmail = await requireAdmin(event)
   const body = await readBody<{ email: string, name: string, expiresInHours?: number }>(event)

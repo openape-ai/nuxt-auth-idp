@@ -1,5 +1,7 @@
 import type { TokenExchangeParams } from '@openape/auth'
+import { createError, defineEventHandler, readRawBody } from 'h3'
 import { handleTokenExchange } from '@openape/auth'
+import { getIdpIssuer, useIdpStores } from '../utils/stores'
 
 export default defineEventHandler(async (event) => {
   const rawBody = await readRawBody(event, 'utf-8')

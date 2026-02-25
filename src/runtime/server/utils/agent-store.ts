@@ -1,3 +1,5 @@
+import { useAppStorage } from './storage'
+
 export interface Agent {
   id: string
   email: string

@@ -1,4 +1,5 @@
 import type { ChallengeStore, WebAuthnChallenge } from '@openape/auth'
+import { useAppStorage } from './storage'
 
 export function createChallengeStore(): ChallengeStore {
   const storage = useAppStorage()

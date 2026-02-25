@@ -1,6 +1,9 @@
 import type { AuthorizeParams } from '@openape/auth'
+import { createError, defineEventHandler, getQuery, getRequestURL, sendRedirect } from 'h3'
 import { extractDomain, resolveDDISA } from '@openape/core'
 import { evaluatePolicy, validateAuthorizeRequest } from '@openape/auth'
+import { getAppSession } from '../utils/session'
+import { useIdpStores } from '../utils/stores'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)

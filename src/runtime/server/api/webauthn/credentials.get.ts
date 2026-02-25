@@ -1,3 +1,7 @@
+import { defineEventHandler } from 'h3'
+import { requireAuth } from '../../utils/admin'
+import { useIdpStores } from '../../utils/stores'
+
 export default defineEventHandler(async (event) => {
   const userId = await requireAuth(event)
   const { credentialStore } = useIdpStores()

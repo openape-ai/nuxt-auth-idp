@@ -1,4 +1,6 @@
+import { defineEventHandler } from 'h3'
 import { exportJWK } from 'jose'
+import { useIdpStores } from '../../utils/stores'
 
 export default defineEventHandler(async () => {
   const { keyStore } = useIdpStores()

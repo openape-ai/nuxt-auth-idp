@@ -1,3 +1,4 @@
+import { useRuntimeConfig } from 'nitropack/runtime'
 import { createAgentStore } from './agent-store'
 import { createChallengeStore } from './challenge-store'
 import { createCodeStore } from './code-store'

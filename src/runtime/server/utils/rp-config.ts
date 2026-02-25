@@ -1,4 +1,5 @@
 import type { RPConfig } from '@openape/auth'
+import { useRuntimeConfig } from 'nitropack/runtime'
 
 export function getRPConfig(): RPConfig {
   const config = useRuntimeConfig()

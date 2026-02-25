@@ -1,3 +1,7 @@
+import { createError, defineEventHandler } from 'h3'
+import { isAdmin } from '../utils/admin'
+import { getAppSession } from '../utils/session'
+
 export default defineEventHandler(async (event) => {
   const session = await getAppSession(event)
 

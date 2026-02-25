@@ -1,4 +1,8 @@
+import { createError, defineEventHandler, readBody } from 'h3'
 import { verifyAuthentication } from '@openape/auth'
+import { getAppSession } from '../../../utils/session'
+import { getRPConfig } from '../../../utils/rp-config'
+import { useIdpStores } from '../../../utils/stores'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ challengeToken: string, response: any }>(event)
