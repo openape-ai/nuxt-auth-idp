@@ -335,7 +335,7 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-(--ui-border)">
-                    <tr v-for="u in users" :key="u.email" class="hover:bg-(--ui-bg-elevated)">
+                    <tr v-for="u in users" :key="u.email" class="odd:bg-(--ui-bg-elevated)/40 even:bg-(--ui-bg) hover:bg-(--ui-bg-elevated)">
                       <td class="px-4 py-3 text-sm">
                         {{ u.name }}
                       </td>
@@ -480,7 +480,7 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-(--ui-border)">
-                    <tr v-for="a in agents" :key="a.id" class="hover:bg-(--ui-bg-elevated)">
+                    <tr v-for="a in agents" :key="a.id" class="odd:bg-(--ui-bg-elevated)/40 even:bg-(--ui-bg) hover:bg-(--ui-bg-elevated)">
                       <td class="px-4 py-3 text-sm text-muted font-mono text-xs">
                         {{ a.email }}
                       </td>
@@ -593,7 +593,7 @@ function regUrlStatus(entry: RegistrationUrlEntry): { label: string, color: stri
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-(--ui-border)">
-                    <tr v-for="r in regUrls" :key="r.token" class="hover:bg-(--ui-bg-elevated)">
+                    <tr v-for="r in regUrls" :key="r.token" class="odd:bg-(--ui-bg-elevated)/40 even:bg-(--ui-bg) hover:bg-(--ui-bg-elevated)">
                       <td class="px-4 py-3 text-sm font-mono text-muted">
                         {{ r.email }}
                       </td>

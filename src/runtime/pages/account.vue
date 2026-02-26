@@ -160,7 +160,7 @@ function deviceLabel(c: Credential): string {
               </tr>
             </thead>
             <tbody class="divide-y divide-(--ui-border)">
-              <tr v-for="c in credentials" :key="c.credentialId" class="hover:bg-(--ui-bg-elevated)">
+              <tr v-for="c in credentials" :key="c.credentialId" class="odd:bg-(--ui-bg-elevated)/40 even:bg-(--ui-bg) hover:bg-(--ui-bg-elevated)">
                 <td class="px-4 py-3 text-sm">
                   {{ deviceLabel(c) }}
                 </td>
