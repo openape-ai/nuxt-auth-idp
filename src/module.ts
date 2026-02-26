@@ -45,10 +45,10 @@ export default defineNuxtModule<ModuleOptions>({
     s3: {
       accessKeyId: '',
       secretAccessKey: '',
-      bucket: 'dnsid',
-      endpoint: 'https://sos-at-vie-2.exo.io',
-      region: 'at-vie-2',
-      prefix: 'openape-idp/',
+      bucket: '',
+      endpoint: '',
+      region: '',
+      prefix: '',
     },
   },
   setup(options, nuxt) {
@@ -59,6 +59,15 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.runtimeConfig.openapeIdp as Record<string, unknown> || {},
       options,
     )
+
+    // Dev storage: always use local filesystem in development
+    nuxt.options.nitro = nuxt.options.nitro || {}
+    nuxt.options.nitro.devStorage = defu(nuxt.options.nitro.devStorage || {}, {
+      db: {
+        driver: 'fsLite',
+        base: options.storagePath || './.data/openape-idp-db',
+      },
+    })
 
     // Register server plugin (storage mount)
     addServerPlugin(resolve('./runtime/server/plugins/storage'))

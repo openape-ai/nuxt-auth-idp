@@ -12,24 +12,35 @@ export default defineNitroPlugin(async () => {
       storage.mount('db', s3Driver({
         accessKeyId: s3.accessKeyId,
         secretAccessKey: s3.secretAccessKey,
-        bucket: s3.bucket || 'dnsid',
-        endpoint: s3.endpoint || 'https://sos-at-vie-2.exo.io',
-        region: s3.region || 'at-vie-2',
-        prefix: s3.prefix || 'openape-idp/',
+        bucket: s3.bucket,
+        endpoint: s3.endpoint,
+        region: s3.region,
+        prefix: s3.prefix,
       }))
       // eslint-disable-next-line no-console
       console.log('[openape-idp] Storage: S3 mounted')
     }
     catch (e) {
-      console.error('[openape-idp] Failed to mount S3 storage:', e)
+      console.error('[openape-idp] CRITICAL: Failed to mount S3 storage:', e)
+      console.error('[openape-idp] Falling back to filesystem storage. WARNING: Data will be lost on serverless platforms!')
+      const { default: fsDriver } = await import('unstorage/drivers/fs-lite')
+      const storage = useStorage()
+      const basePath = config.openapeIdp?.storagePath || './.data/openape-idp-db'
+      storage.mount('db', fsDriver({ base: basePath }))
     }
   }
-  else {
+  else if (!import.meta.dev) {
+    // Production without S3 config → fsLite (e.g. VPS deployment)
     const { default: fsDriver } = await import('unstorage/drivers/fs-lite')
     const storage = useStorage()
     const basePath = config.openapeIdp?.storagePath || './.data/openape-idp-db'
     storage.mount('db', fsDriver({ base: basePath }))
     // eslint-disable-next-line no-console
     console.log('[openape-idp] Storage: fsLite (default)')
+  }
+  else {
+    // Dev mode: devStorage already mounted 'db' via module config
+    // eslint-disable-next-line no-console
+    console.log('[openape-idp] Storage: devStorage (local filesystem)')
   }
 })
