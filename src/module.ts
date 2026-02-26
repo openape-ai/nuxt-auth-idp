@@ -7,6 +7,7 @@ export interface ModuleOptions {
   adminEmails: string
   storageDriver: string
   storagePath: string
+  storagePrefix: string
   issuer: string
   rpName: string
   rpID: string
@@ -35,6 +36,7 @@ export default defineNuxtModule<ModuleOptions>({
     adminEmails: '',
     storageDriver: '',
     storagePath: './.data/openape-idp-db',
+    storagePrefix: '',
     issuer: '',
     rpName: '',
     rpID: '',

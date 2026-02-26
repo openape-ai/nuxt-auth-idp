@@ -1,4 +1,5 @@
 import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runtime'
+import { getStoragePrefix } from '../utils/storage'
 
 export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig()
@@ -43,4 +44,7 @@ export default defineNitroPlugin(async () => {
     // eslint-disable-next-line no-console
     console.log('[openape-idp] Storage: devStorage (local filesystem)')
   }
+
+  // eslint-disable-next-line no-console
+  console.log(`[openape-idp] Storage prefix: ${getStoragePrefix()}`)
 })
