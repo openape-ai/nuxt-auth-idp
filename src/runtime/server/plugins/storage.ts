@@ -1,3 +1,5 @@
+import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runtime'
+
 export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig()
   const driver = (config.openapeIdp?.storageDriver || '').trim()
