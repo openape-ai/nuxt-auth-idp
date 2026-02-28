@@ -1,18 +1,14 @@
 {
   "name": "@openape/nuxt-auth-idp",
   "type": "module",
-  "version": "0.1.8",
-  "description": "OpenApe Identity Provider Nuxt module — adds user auth, OAuth, admin, and agent management",
-  "author": "Patrick Hofmann",
+  "version": "0.1.10",
+  "description": "OpenAPE Identity Provider Nuxt module \u2014 adds user auth, OAuth, admin, and agent management",
+  "author": "Delta Mind GmbH",
   "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
-    },
-    "./server": {
-      "types": "./dist/runtime/server/index.d.ts",
-      "import": "./dist/runtime/server/index.js"
     }
   },
   "main": "./dist/module.mjs",
@@ -27,28 +23,20 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.16.0",
-    "@openape/auth": "^0.1.0",
-    "@openape/core": "^0.1.0",
+    "@openape/auth": "workspace:*",
+    "@openape/core": "workspace:*",
     "@simplewebauthn/browser": "^11",
     "defu": "^6.1.4",
-    "h3": "^1.15.0",
     "jose": "^5.9.0",
-    "unstorage": "^1.14.4"
+    "unstorage": "^1.14.4",
+    "@openape/unstorage-s3-driver": "^0.1.0"
   },
   "peerDependencies": {
-    "nitropack": "^2.0.0",
     "nuxt": "^4.0.0"
   },
   "devDependencies": {
     "@nuxt/module-builder": "^0.8.4",
     "nuxt": "^4.3.1",
     "typescript": "^5.7.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/openape-ai/nuxt-auth-idp.git"
   }
 }
