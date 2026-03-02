@@ -55,7 +55,6 @@ async function handleAddDevice() {
 }
 
 async function handleDeleteCredential(credentialId: string) {
-  // eslint-disable-next-line no-alert
   if (!confirm('Remove this device?'))
     return
   error.value = ''

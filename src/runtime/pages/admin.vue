@@ -92,7 +92,6 @@ async function createUser() {
 }
 
 async function deleteUser(email: string) {
-  // eslint-disable-next-line no-alert
   if (!confirm(`Delete user ${email}?`))
     return
   userError.value = ''
@@ -132,7 +131,6 @@ async function createAgent() {
 }
 
 async function deleteAgent(id: string) {
-  // eslint-disable-next-line no-alert
   if (!confirm('Delete this agent?'))
     return
   agentError.value = ''
@@ -218,7 +216,6 @@ async function createRegUrl() {
 }
 
 async function deleteRegUrl(token: string) {
-  // eslint-disable-next-line no-alert
   if (!confirm('Delete this registration URL?'))
     return
   regUrlError.value = ''

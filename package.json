@@ -2,7 +2,7 @@
   "name": "@openape/nuxt-auth-idp",
   "type": "module",
   "version": "0.1.15",
-  "description": "OpenAPE Identity Provider Nuxt module \u2014 adds user auth, OAuth, admin, and agent management",
+  "description": "OpenAPE Identity Provider Nuxt module — adds user auth, OAuth, admin, and agent management",
   "author": "Delta Mind GmbH",
   "license": "AGPL-3.0-or-later",
   "exports": {
@@ -24,7 +24,12 @@
     "build": "nuxt-module-build build",
     "dev": "nuxt-module-build build --stub",
     "prepare": "nuxi prepare playground",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --passWithNoTests",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm pack --dry-run && npm publish --provenance --access public"
   },
   "dependencies": {
     "@nuxt/kit": "^3.16.0",
@@ -42,6 +47,13 @@
     "@types/node": "^22.0.0",
     "nuxt": "^4.3.1",
     "typescript": "^5.7.0",
-    "vue-tsc": "^3.2.0"
+    "vue-tsc": "^3.2.0",
+    "@antfu/eslint-config": "^7.6.1",
+    "eslint": "^9.35.0",
+    "vitest": "^3.2.4",
+    "@changesets/cli": "^2.29.7"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
