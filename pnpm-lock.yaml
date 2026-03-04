@@ -17,6 +17,9 @@ importers:
       '@openape/core':
         specifier: ^0.1.2
         version: 0.1.2
+      '@openape/grants':
+        specifier: ^0.1.2
+        version: 0.1.2(h3@1.15.5)
       '@simplewebauthn/browser':
         specifier: ^11
         version: 11.0.0
@@ -1043,6 +1046,14 @@ packages:
 
   '@openape/core@0.1.2':
     resolution: {integrity: sha512-NPhuJ9gD8wEYWZsGs+ecc/xYjihmvFO9hvAa+M/BayJf7C4G5ToF5YteNwD5OEqWKfdZ4C5LPtjkZSVObUvhCQ==}
+
+  '@openape/grants@0.1.2':
+    resolution: {integrity: sha512-chQ6XnTGpe1mGty4wHGrlOKEtBF42gqdj7OKcjwRCS48uICNqQEmrqeCfydAEVKofuVvgBTQ+YggydVBYdD/2Q==}
+    peerDependencies:
+      h3: ^1.13.0
+    peerDependenciesMeta:
+      h3:
+        optional: true
 
   '@ota-meshi/ast-token-store@0.3.0':
     resolution: {integrity: sha512-XRO0zi2NIUKq2lUk3T1ecFSld1fMWRKE6naRFGkgkdeosx7IslyUKNv5Dcb5PJTja9tHJoFu0v/7yEpAkrkrTg==}
@@ -6370,6 +6381,13 @@ snapshots:
   '@openape/core@0.1.2':
     dependencies:
       jose: 5.10.0
+
+  '@openape/grants@0.1.2(h3@1.15.5)':
+    dependencies:
+      '@openape/core': 0.1.2
+      jose: 5.10.0
+    optionalDependencies:
+      h3: 1.15.5
 
   '@ota-meshi/ast-token-store@0.3.0': {}
 

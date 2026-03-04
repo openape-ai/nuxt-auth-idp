@@ -1,6 +1,11 @@
 import { defineNuxtModule, createResolver, addServerHandler, addImportsDir, addServerImportsDir, extendPages } from '@nuxt/kit'
 import { defu } from 'defu'
 
+export interface GrantsOptions {
+  enablePages: boolean
+  storageKey: string
+}
+
 export interface ModuleOptions {
   sessionSecret: string
   managementToken: string
@@ -13,6 +18,7 @@ export interface ModuleOptions {
   requireUserVerification: boolean
   residentKey: 'preferred' | 'required' | 'discouraged'
   attestationType: 'none' | 'indirect' | 'direct' | 'enterprise'
+  grants: Partial<GrantsOptions>
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -32,15 +38,32 @@ export default defineNuxtModule<ModuleOptions>({
     requireUserVerification: false,
     residentKey: 'preferred',
     attestationType: 'none',
+    grants: {
+      enablePages: true,
+      storageKey: 'openape-grants',
+    },
   },
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url)
 
-    // Inject runtime config
+    // Resolve grants options (defaults always filled by defineNuxtModule)
+    const legacyGrantsConfig = (nuxt.options as unknown as Record<string, unknown>).openapeGrants as Partial<GrantsOptions> | undefined
+    const grants: GrantsOptions = {
+      enablePages: legacyGrantsConfig?.enablePages ?? options.grants.enablePages ?? true,
+      storageKey: legacyGrantsConfig?.storageKey ?? options.grants.storageKey ?? 'openape-grants',
+    }
+
+    // Inject runtime config — IdP (defaults ensure all fields are populated)
     nuxt.options.runtimeConfig.openapeIdp = defu(
       nuxt.options.runtimeConfig.openapeIdp as Record<string, unknown> || {},
       options,
-    ) as typeof options
+    ) as typeof nuxt.options.runtimeConfig.openapeIdp
+
+    // Inject runtime config — Grants
+    nuxt.options.runtimeConfig.openapeGrants = defu(
+      nuxt.options.runtimeConfig.openapeGrants as Record<string, unknown> || {},
+      { storageKey: grants.storageKey },
+    ) as { storageKey: string }
 
     // Register server utils (auto-imported by Nitro)
     addServerImportsDir(resolve('./runtime/server/utils'))
@@ -52,6 +75,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.routeRules = defu(nuxt.options.routeRules || {}, {
       '/.well-known/**': { cors: true },
       '/token': { cors: true },
+      '/api/grants/**': { cors: true },
+      '/api/agent/**': { cors: true },
     })
 
     // Pages (overridable by the consuming app)
@@ -62,6 +87,14 @@ export default defineNuxtModule<ModuleOptions>({
         { name: 'openape-account', path: '/account', file: resolve('./runtime/pages/account.vue') },
         { name: 'openape-admin', path: '/admin', file: resolve('./runtime/pages/admin.vue') },
       ]
+
+      if (grants.enablePages) {
+        modulePages.push(
+          { name: 'openape-grant-approval', path: '/grant-approval', file: resolve('./runtime/pages/grant-approval.vue') },
+          { name: 'openape-grants', path: '/grants', file: resolve('./runtime/pages/grants.vue') },
+          { name: 'openape-enroll', path: '/enroll', file: resolve('./runtime/pages/enroll.vue') },
+        )
+      }
 
       for (const page of modulePages) {
         if (!pages.some(p => p.path === page.path)) {
@@ -110,5 +143,20 @@ export default defineNuxtModule<ModuleOptions>({
     addServerHandler({ route: '/api/admin/registration-urls', handler: resolve('./runtime/server/api/admin/registration-urls/index.get') })
     addServerHandler({ route: '/api/admin/registration-urls', method: 'post', handler: resolve('./runtime/server/api/admin/registration-urls/index.post') })
     addServerHandler({ route: '/api/admin/registration-urls/:token', method: 'delete', handler: resolve('./runtime/server/api/admin/registration-urls/[token].delete') })
+
+    // Server route handlers — Grants
+    addServerHandler({ route: '/api/grants', handler: resolve('./runtime/server/api/grants/index.get') })
+    addServerHandler({ route: '/api/grants', method: 'post', handler: resolve('./runtime/server/api/grants/index.post') })
+    addServerHandler({ route: '/api/grants/verify', method: 'post', handler: resolve('./runtime/server/api/grants/verify.post') })
+    addServerHandler({ route: '/api/grants/:id', handler: resolve('./runtime/server/api/grants/[id].get') })
+    addServerHandler({ route: '/api/grants/:id/approve', method: 'post', handler: resolve('./runtime/server/api/grants/[id]/approve.post') })
+    addServerHandler({ route: '/api/grants/:id/deny', method: 'post', handler: resolve('./runtime/server/api/grants/[id]/deny.post') })
+    addServerHandler({ route: '/api/grants/:id/revoke', method: 'post', handler: resolve('./runtime/server/api/grants/[id]/revoke.post') })
+    addServerHandler({ route: '/api/grants/:id/token', method: 'post', handler: resolve('./runtime/server/api/grants/[id]/token.post') })
+
+    // Server route handlers — Agent
+    addServerHandler({ route: '/api/agent/challenge', method: 'post', handler: resolve('./runtime/server/api/agent/challenge.post') })
+    addServerHandler({ route: '/api/agent/authenticate', method: 'post', handler: resolve('./runtime/server/api/agent/authenticate.post') })
+    addServerHandler({ route: '/api/agent/enroll', method: 'post', handler: resolve('./runtime/server/api/agent/enroll.post') })
   },
 })
