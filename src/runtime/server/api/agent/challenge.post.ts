@@ -1,4 +1,6 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import { useIdpStores } from '../../utils/stores'
+import { useGrantStores } from '../../utils/grant-stores'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ agent_id: string }>(event)
@@ -10,11 +12,13 @@ export default defineEventHandler(async (event) => {
   const { agentStore } = useIdpStores()
   const { challengeStore } = useGrantStores()
 
-  const agent = await agentStore.findById(body.agent_id)
+  const agent = body.agent_id.includes('@')
+    ? await agentStore.findByEmail(body.agent_id)
+    : await agentStore.findById(body.agent_id)
   if (!agent || !agent.isActive) {
     throw createError({ statusCode: 404, statusMessage: 'Agent not found or inactive' })
   }
 
-  const challenge = await challengeStore.createChallenge(body.agent_id)
+  const challenge = await challengeStore.createChallenge(agent.id)
   return { challenge }
 })

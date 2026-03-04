@@ -1,4 +1,8 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import { getIdpIssuer, useIdpStores } from '../../utils/stores'
+import { useGrantStores } from '../../utils/grant-stores'
+import { verifyEd25519Signature } from '../../utils/ed25519'
+import { issueAgentToken } from '../../utils/agent-token'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -14,14 +18,16 @@ export default defineEventHandler(async (event) => {
   const { agentStore, keyStore } = useIdpStores()
   const { challengeStore } = useGrantStores()
 
-  const valid = await challengeStore.consumeChallenge(body.challenge, body.agent_id)
-  if (!valid) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid, expired, or already used challenge' })
-  }
-
-  const agent = await agentStore.findById(body.agent_id)
+  const agent = body.agent_id.includes('@')
+    ? await agentStore.findByEmail(body.agent_id)
+    : await agentStore.findById(body.agent_id)
   if (!agent || !agent.isActive) {
     throw createError({ statusCode: 404, statusMessage: 'Agent not found or inactive' })
+  }
+
+  const valid = await challengeStore.consumeChallenge(body.challenge, agent.id)
+  if (!valid) {
+    throw createError({ statusCode: 401, statusMessage: 'Invalid, expired, or already used challenge' })
   }
 
   const signatureBuffer = Buffer.from(body.signature, 'base64')

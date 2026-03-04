@@ -12,8 +12,8 @@ importers:
         specifier: ^3.16.0
         version: 3.21.1(magicast@0.5.2)
       '@openape/auth':
-        specifier: ^0.1.2
-        version: 0.1.2(h3@1.15.5)
+        specifier: ^0.1.4
+        version: 0.1.4(h3@1.15.5)
       '@openape/core':
         specifier: ^0.1.2
         version: 0.1.2
@@ -1036,8 +1036,9 @@ packages:
       rolldown:
         optional: true
 
-  '@openape/auth@0.1.2':
-    resolution: {integrity: sha512-lJvEsOkgSPtBm1NvxDVRBM9v45VItLg9oduAc7TTVjYJDvkf5rBVrSR8wYg+LI+l4Z6YgUYUeybYCUBF5a9zMQ==}
+  '@openape/auth@0.1.4':
+    resolution: {integrity: sha512-Uf0UCRFebZvNzuKBBOGg1Pu2h9DaYARMFTZuzG+8NaqFX7NtbDOENIII8aV29WYWALOA/0K+X2FT2sq5ugiX6A==}
+    engines: {node: '>=22'}
     peerDependencies:
       h3: ^1.13.0
     peerDependenciesMeta:
@@ -6367,7 +6368,7 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@openape/auth@0.1.2(h3@1.15.5)':
+  '@openape/auth@0.1.4(h3@1.15.5)':
     dependencies:
       '@openape/core': 0.1.2
       '@simplewebauthn/server': 11.0.0

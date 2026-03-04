@@ -1,4 +1,6 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import { useIdpStores } from '../../utils/stores'
+import { requireAdmin } from '../../utils/admin'
 
 export default defineEventHandler(async (event) => {
   const adminEmail = await requireAdmin(event)
